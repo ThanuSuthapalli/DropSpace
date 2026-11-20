@@ -1,0 +1,64 @@
+.pwa-install-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 16px;
+  padding: 11px 12px;
+  border: 1px solid #e5e3dc;
+  border-radius: 8px;
+  background: #fbfaf6;
+}
+
+.pwa-install-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 7px;
+  background: #eee6d9;
+  color: #a45d35;
+}
+
+.pwa-install-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.pwa-install-copy strong {
+  font-size: 10px;
+}
+
+.pwa-install-copy p {
+  margin: 3px 0 0;
+  color: #898980;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.pwa-install-copy .pwa-install-error {
+  color: #a14f39;
+}
+
+.pwa-dismiss {
+  width: 29px;
+  height: 29px;
+  flex: none;
+}
+
+.dark .pwa-install-card {
+  border-color: #45463d;
+  background: #30312a;
+  color: #eee;
+}
+
+@media (max-width: 560px) {
+  .pwa-install-card {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .pwa-install-card > .secondary-button {
+    padding: 8px;
+  }
+}

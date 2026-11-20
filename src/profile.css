@@ -1,0 +1,240 @@
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 760px;
+}
+
+.profile-account-card,
+.profile-section,
+.profile-security-note {
+  border: 1px solid #e5e3dc;
+  border-radius: 9px;
+  background: #fbfaf6;
+}
+
+.profile-account-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+}
+
+.profile-account-avatar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: 50%;
+  background: #ded5c7;
+  color: #292a25;
+  font: 700 16px Manrope, sans-serif;
+}
+
+.profile-account-details {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-account-details h2,
+.profile-section-heading h2 {
+  margin: 4px 0;
+  font: 650 16px Manrope, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.profile-account-details p,
+.profile-section-heading p,
+.device-management p {
+  margin: 5px 0 0;
+  color: #898980;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.profile-sync-badge,
+.device-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #6f806a;
+  font-size: 9px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.profile-section {
+  padding: 18px;
+}
+
+.profile-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.device-row {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #e8e6df;
+  border-radius: 7px;
+  background: #fffefa;
+}
+
+.device-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  place-items: center;
+  border-radius: 7px;
+  background: #f0eee7;
+  color: #a3623c;
+}
+
+.device-details {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-details strong {
+  font-size: 10px;
+}
+
+.device-details span {
+  color: #929187;
+  font-size: 9px;
+}
+
+.device-current {
+  border-radius: 12px;
+  background: #edf1e9;
+  padding: 5px 8px;
+}
+
+.profile-empty,
+.profile-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border: 1px dashed #d8d4c9;
+  border-radius: 7px;
+  color: #898980;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.profile-error,
+.profile-error-text {
+  color: #a14f39;
+}
+
+.device-management {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 15px;
+  border-top: 1px solid #eeece5;
+}
+
+.device-management strong {
+  font-size: 10px;
+}
+
+.device-confirm-actions {
+  display: flex;
+  flex: none;
+  gap: 7px;
+}
+
+.profile-error-text {
+  margin: 12px 0 0;
+  font-size: 10px;
+}
+
+.profile-security-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px;
+  color: #77766c;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.profile-security-note svg {
+  flex: none;
+  color: #a3623c;
+}
+
+.profile-security-note p {
+  margin: 0;
+}
+
+.profile-signout {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: #a14f39;
+  font: inherit;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.dark .profile-account-card,
+.dark .profile-section,
+.dark .profile-security-note,
+.dark .device-row {
+  border-color: #45463d;
+  background: #30312a;
+  color: #eee;
+}
+
+.dark .device-row {
+  background: #292a25;
+}
+
+.dark .profile-empty,
+.dark .profile-error {
+  border-color: #555044;
+}
+
+.dark .device-management {
+  border-color: #45463d;
+}
+
+@media (max-width: 600px) {
+  .profile-account-card,
+  .profile-section-heading,
+  .device-management {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-sync-badge {
+    margin-left: 58px;
+  }
+}

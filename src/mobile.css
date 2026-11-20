@@ -1,0 +1,215 @@
+@media (max-width: 720px) {
+  .app-shell {
+    display: block;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
+  }
+
+  .sidebar {
+    position: fixed;
+    z-index: 15;
+    inset: auto 0 0;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+    min-height: 0;
+    height: calc(66px + env(safe-area-inset-bottom));
+    padding: 5px 4px calc(5px + env(safe-area-inset-bottom));
+    border-top: 1px solid #e3e1d9;
+    border-right: 0;
+    box-shadow: 0 -4px 16px #1718130d;
+  }
+
+  .sidebar > .brand,
+  .sidebar > .new-button,
+  .sidebar > .side-section:nth-of-type(3) {
+    display: none;
+  }
+
+  .sidebar > .side-section:nth-of-type(2),
+  .sidebar-bottom {
+    display: contents;
+  }
+
+  .sidebar .section-label,
+  .sidebar-bottom > .storage-card,
+  .sidebar-bottom > .profile-row {
+    display: none;
+  }
+
+  .sidebar .nav-item {
+    width: auto;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px 2px;
+    border-radius: 8px;
+    font-size: 8px;
+    line-height: 1.05;
+    text-align: center;
+  }
+
+  .sidebar .nav-item svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .sidebar .nav-text,
+  .sidebar .nav-count {
+    display: none;
+  }
+
+  .sidebar .nav-short {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .sidebar-bottom > button.nav-item:last-of-type .nav-text {
+    display: block;
+    flex: none;
+    font-size: 7px;
+    white-space: nowrap;
+  }
+
+  .main-area {
+    width: 100%;
+  }
+
+  .topbar {
+    position: sticky;
+    z-index: 10;
+    top: 0;
+    height: 54px;
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .topbar::before {
+    width: 24px;
+    height: 24px;
+    flex: none;
+    border-radius: 6px;
+    background: #bc693c url("/dropspace-logo.png") center / cover no-repeat;
+    background-blend-mode: screen;
+    content: "";
+  }
+
+  .breadcrumbs {
+    flex: 1;
+    gap: 0;
+    min-width: 0;
+  }
+
+  .breadcrumbs span:first-child,
+  .breadcrumbs .slash,
+  .top-actions > .icon-button {
+    display: none;
+  }
+
+  .top-actions {
+    flex: none;
+    gap: 0;
+  }
+
+  .search-wrap {
+    width: min(150px, 45vw);
+  }
+
+  .content-layout {
+    display: block;
+    min-height: 0;
+  }
+
+  .content-main {
+    max-width: none;
+    padding: 18px 14px 26px;
+  }
+
+  .page-heading {
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .page-heading h1 {
+    font-size: 23px;
+  }
+
+  .page-heading p {
+    max-width: 240px;
+    line-height: 1.5;
+  }
+
+  .stats-grid {
+    gap: 8px;
+  }
+
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filter-list {
+    width: 100%;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .toolbar-right {
+    justify-content: flex-end;
+  }
+
+  .resource-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .modal-backdrop {
+    overflow-y: auto;
+    align-items: center;
+    padding: 12px 10px calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .modal-card {
+    width: 100%;
+    max-height: calc(100dvh - 24px);
+    padding: 17px;
+  }
+
+  .upload-modal {
+    max-height: calc(100dvh - 24px);
+    padding: 16px;
+  }
+
+  .detail-drawer {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .drawer-actions {
+    flex-wrap: wrap;
+  }
+
+  .toast {
+    bottom: calc(74px + env(safe-area-inset-bottom));
+    max-width: calc(100vw - 24px);
+  }
+
+  .dark .sidebar {
+    border-top-color: #3c3d35;
+  }
+}
+
+@media (max-width: 560px) {
+  .direct-link-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
