@@ -124,11 +124,13 @@ export default function App() {
         Boolean(item && typeof item === "object" && "id" in item && "project" in item && "type" in item),
       );
       if (!pending.length) return;
+      const targetProject = projects[0] || "Inbox";
+      const capturedItems = pending.map((item) => ({ ...item, project: targetProject }));
       setItems((current) => {
         const existingIds = new Set(current.map((item) => item.id));
-        return [...pending.filter((item) => !existingIds.has(item.id)), ...current];
+        return [...capturedItems.filter((item) => !existingIds.has(item.id)), ...current];
       });
-      setProjects((current) => [...new Set([...current, ...pending.map((item) => item.project)])]);
+      setProjects((current) => [...new Set([...current, targetProject])]);
       void chrome.storage.local.set({ [pendingKey]: [] }).catch((error: unknown) => {
         setToast(error instanceof Error ? `Could not clear captured items: ${error.message}` : "Could not clear captured items.");
       });
@@ -145,7 +147,7 @@ export default function App() {
       active = false;
       chrome.storage.onChanged.removeListener(listener);
     };
-  }, [session?.user.id, workspaceReady]);
+  }, [projects, session?.user.id, workspaceReady]);
 
   useEffect(() => {
     if (!supabaseConfigured || !session || !workspaceReady) {
@@ -198,7 +200,7 @@ export default function App() {
   const [dropType,setDropType] = useState<ResourceType>("Link");
   const [formTitle,setFormTitle] = useState("");
   const [formContent,setFormContent] = useState("");
-  const [formProject,setFormProject] = useState("Research");
+  const [formProject,setFormProject] = useState("");
   const [createSpaceInDrop,setCreateSpaceInDrop] = useState(false);
   const [newDropSpaceName,setNewDropSpaceName] = useState("");
   const [entryDrafts,setEntryDrafts] = useState<ResourceEntry[]>([]);
@@ -268,13 +270,14 @@ export default function App() {
       setDeviceRecords(prev => prev.filter(device => device.device_id === currentDeviceId));
     }
   }
-  function openDrop(type:ResourceType){setDropType(type);setFormTitle("");setFormContent("");setDraftKind("link");setDraftValue("");setEntryDrafts([]);setFormProject(project==="All"?"Research":project);setCreateSpaceInDrop(false);setNewDropSpaceName("");setModal("drop");}
+  function openDrop(type:ResourceType){setDropType(type);setFormTitle("");setFormContent("");setDraftKind("link");setDraftValue("");setEntryDrafts([]);setFormProject(project==="All"?(projects[0]||""):project);setCreateSpaceInDrop(projects.length===0);setNewDropSpaceName("");setModal("drop");}
   function addResource(resource:Partial<Resource>){const item:Resource={id:uid(),type:dropType,title:formTitle.trim(),description:formContent.trim() || (resource.entries?.length ? `${resource.entries.filter(e=>e.kind==="link").length} link${resource.entries.filter(e=>e.kind==="link").length===1?"":"s"} • ${resource.entries.filter(e=>e.kind==="note").length} note${resource.entries.filter(e=>e.kind==="note").length===1?"":"s"}` : ""),content:dropType==="Note"?formContent.trim():"",url:dropType==="Link"?formContent.trim():"",project:formProject,createdAt:Date.now(),starred:false,archived:false,...resource};setItems(prev=>[item,...prev]);setModal(null);notify("Added to your space");}
   function saveDrop(){
     const normalizedEntries = entryDrafts.filter(e => e.value.trim().length > 0);
     const targetSpace = createSpaceInDrop ? newDropSpaceName.trim() : formProject;
     if(!formTitle.trim()){notify("Add a title first");return;}
     if(createSpaceInDrop && !targetSpace){notify("Enter a name for the new space");return;}
+    if(!targetSpace){notify("Choose or create a space first");return;}
     if(createSpaceInDrop && projects.some(name=>name.toLowerCase()===targetSpace.toLowerCase())){notify("A space with that name already exists");return;}
     if(dropType==="Link" && !formContent.trim() && normalizedEntries.length===0){notify("Add a link or note before saving");return;}
     if(dropType==="Link" && formContent.trim() && !/^https?:\/\//i.test(formContent.trim())){notify("Please enter a valid http(s) URL");return;}
@@ -400,8 +403,8 @@ export default function App() {
         setDropType("Link");
         setFormTitle(parsed.hostname);
         setFormContent(parsed.href);
-        setFormProject(project==="All"?(projects[0]||"Research"):project);
-        setCreateSpaceInDrop(false);
+        setFormProject(project==="All"?(projects[0]||""):project);
+        setCreateSpaceInDrop(projects.length===0);
         setNewDropSpaceName("");
         setEntryDrafts([]);
         setModal("drop");
@@ -441,6 +444,7 @@ export default function App() {
   function setCurrentView(v:View){setView(v);setProject("All");setSelected(null);}
   const title=view==="Project"?project:view==="Inbox"?"All drops":view==="Recent"?"Recently added":view==="Home"?"Home":view==="Profile"?"Profile":view;
   const subtitle=view==="Home"?"Your links, files and ideas, ready when you are.":view==="Profile"?"Manage your account and connected devices.":view==="Inbox"?"Everything you've collected, all in one place.":view==="Recent"?"The things you've saved lately.":view==="Starred"?"Your most important resources.":view==="Archive"?"Finished for now. Kept for later.":view==="Trash"?"Items waiting to be permanently removed.":"A dedicated space for your resources.";
+  const accountLabel = session?.user.email || "Local workspace";
 
   if (!authReady) {
     return <main className="auth-screen"><section className="auth-card">Connecting to Supabase...</section></main>;
@@ -481,7 +485,7 @@ export default function App() {
         <div className="storage-card"><div className="storage-head"><span>{supabaseConfigured?"Cloud sync":"Local storage"}</span><span>Private</span></div><div className="storage-track"><div/></div><div className="storage-note">{supabaseConfigured?"Synced to your Supabase account":"Stored on this device · No account needed"}</div></div>
         <NavButton active={view==="Profile"} icon={<UserRound/>} label="Profile" onClick={()=>setCurrentView("Profile")}/>
         <button className="nav-item" onClick={()=>setModal("settings")}><Settings size={16}/><span className="nav-text">Settings</span></button>
-        <div className="profile-row"><div className="avatar">Y</div><div><div className="profile-name">My workspace</div><div className="profile-sub">Personal account</div></div></div>
+        <div className="profile-row"><div className="avatar">{accountLabel[0]?.toUpperCase() || "D"}</div><div><div className="profile-name">{accountLabel}</div><div className="profile-sub">{session ? "Supabase account" : "This device"}</div></div></div>
       </div>
     </aside>
     <main className="main-area">
@@ -513,7 +517,7 @@ export default function App() {
         </section>
         {view!=="Profile"&&<aside className="right-panel">
           <div className="panel-title">QUICK ACCESS <span>⌘ K</span></div>
-          <div className="resume-card"><div className="eyebrow">PICK UP WHERE YOU LEFT OFF</div><h3>Your research desk</h3><p>Keep your reading, references and notes together.</p><button onClick={()=>{setProject("Research");setView("Project");}}>Open space <ArrowUpRight size={13}/></button></div>
+          <div className="resume-card"><div className="eyebrow">{projects.length?"QUICK ACCESS":"GET STARTED"}</div><h3>{projects[0]||"Create your first space"}</h3><p>{projects.length?"Open a space to view and organize its resources.":"Create a space to organize your links, notes, files, and images."}</p><button onClick={()=>{if(projects.length){setProject(projects[0]);setView("Project");}else{setFormTitle("");setModal("project");}}}>{projects.length?"Open space":"Create a space"} <ArrowUpRight size={13}/></button></div>
           <div className="panel-block"><div className="panel-heading">RECENT SPACES</div>{projects.slice(0,4).map((p,i)=><button className="recent-space" key={p} onClick={()=>{setProject(p);setView("Project");}}><span className={`space-dot dot-${i%4}`}>◇</span>{p}<span>{items.filter(x=>x.project===p&&!x.deleted&&!x.archived).length.toString().padStart(2,"0")}</span></button>)}</div>
           <div className="panel-divider"/>
           <div className="panel-block"><div className="panel-heading">QUICK ACTIONS</div><div className="quick-grid"><button onClick={()=>openDrop("Note")}><Plus size={14}/> Note</button><button onClick={()=>openDrop("Link")}><ArrowUpRight size={14}/> Link</button><button onClick={()=>fileRef.current?.click()}><Upload size={14}/> File</button><button onClick={()=>{setFormTitle("");setModal("project");}}><FolderPlus size={14}/> Space</button></div></div>
@@ -543,10 +547,10 @@ export default function App() {
       <div className="modal-head"><div><div className="eyebrow">{modal==="drop"?"CAPTURE SOMETHING":modal==="project"?"ORGANIZE YOUR WORK":"PREFERENCES"}</div><h2>{modal==="drop"?"Add a new drop":modal==="project"?"Create a space":modal==="settings"?"Workspace settings":"Keyboard shortcuts"}</h2></div><button className="icon-button" onClick={()=>setModal(null)}><X size={17}/></button></div>
       {modal==="drop"&&<><div className="type-tabs">{(["Link","Note","Image","File"] as ResourceType[]).map(t=><button className={dropType===t?"selected":""} key={t} onClick={()=>setDropType(t)}>{iconFor(t)}{t}</button>)}</div><label className="form-label">TITLE</label><input className="form-input" value={formTitle} onChange={e=>setFormTitle(e.target.value)} placeholder="Give your drop a name"/><label className="form-label">PRIMARY {dropType==="Link"?"URL":"NOTE"}</label><textarea className="form-input form-textarea" value={formContent} onChange={e=>setFormContent(e.target.value)} placeholder={dropType==="Link"?"https://example.com":"Write something worth keeping..."}/><div className="settings-row"><div><strong>Add more links and notes</strong><p>Capture a single resource with multiple timestamps.</p></div></div><div className="settings-row"><select value={draftKind} onChange={e=>setDraftKind(e.target.value as "link"|"note")}><option value="link">Link</option><option value="note">Note</option></select><input className="form-input" value={draftValue} onChange={e=>setDraftValue(e.target.value)} placeholder={draftKind==="link"?"https://example.com":"Add a timestamped note"}/><button className="secondary-button" onClick={addDraftEntry}><Plus size={14}/> Add entry</button></div>{entryDrafts.length>0 && <div className="panel-block"><div className="panel-heading">ADDED ENTRIES</div>{entryDrafts.map(entry=><div key={entry.id} className="shortcut-row"><span>{entry.kind === "link" ? "Link" : "Note"} · {dateTimeLabel(entry.createdAt)}</span><button className="icon-button" onClick={()=>setEntryDrafts(prev=>prev.filter(item=>item.id!==entry.id))}><X size={13}/></button></div>)}</div>}<label className="form-label">{createSpaceInDrop?"NEW SPACE NAME":"SPACE"}</label>{createSpaceInDrop?<input className="form-input" autoFocus value={newDropSpaceName} onChange={e=>setNewDropSpaceName(e.target.value)} placeholder="e.g. Product research"/>:<select className="form-input" value={formProject} onChange={e=>setFormProject(e.target.value)}>{projects.map(p=><option key={p}>{p}</option>)}</select>}<button type="button" className="inline-space-toggle" onClick={()=>{setCreateSpaceInDrop(!createSpaceInDrop);setNewDropSpaceName("");}}><FolderPlus size={14}/>{createSpaceInDrop?"Choose an existing space":"Create a new space"}</button><div className="modal-actions"><button className="secondary-button" onClick={()=>setModal(null)}>Cancel</button><button className="primary-button" onClick={saveDrop}><Plus size={15}/> Save drop</button></div></>}
       {modal==="project"&&<><label className="form-label">SPACE NAME</label><input className="form-input" autoFocus value={formTitle} onChange={e=>setFormTitle(e.target.value)} placeholder="e.g. Product research"/><p className="form-hint">Create a dedicated place for links, notes, files and references.</p><div className="modal-actions"><button className="secondary-button" onClick={()=>setModal(null)}>Cancel</button><button className="primary-button" onClick={createProject}><FolderPlus size={15}/> Create space</button></div></>}
-      {modal==="settings"&&<><div className="settings-row"><div><strong>Appearance</strong><p>Choose the workspace theme.</p></div><select value={dark?"dark":"light"} onChange={e=>setDark(e.target.value==="dark")}><option value="light">Warm light</option><option value="dark">Dark</option></select></div><div className="settings-row"><div><strong>Export workspace</strong><p>Download your resources as JSON.</p></div><button className="secondary-button" onClick={exportData}><ArrowDownToLine size={14}/> Export</button></div><div className="settings-row"><div><strong>Import workspace</strong><p>Restore a previous DropSpace export.</p></div><label className="secondary-button">Import<input type="file" accept=".json,application/json" hidden onChange={e=>importData(e.target.files?.[0])}/></label></div><div className="settings-note"><HardDrive size={15}/> {supabaseConfigured?"Your workspace is synced to Supabase and protected by account-level access policies.":"Your prototype data is saved in this browser using local storage. No account or cloud service is connected."}</div><div className="modal-actions"><button className="primary-button" onClick={()=>setModal(null)}>Done</button></div></>}
+      {modal==="settings"&&<><div className="settings-row"><div><strong>Appearance</strong><p>Choose the workspace theme.</p></div><select value={dark?"dark":"light"} onChange={e=>setDark(e.target.value==="dark")}><option value="light">Warm light</option><option value="dark">Dark</option></select></div><div className="settings-row"><div><strong>Export workspace</strong><p>Download your resources as JSON.</p></div><button className="secondary-button" onClick={exportData}><ArrowDownToLine size={14}/> Export</button></div><div className="settings-row"><div><strong>Import workspace</strong><p>Restore a previous DropSpace export.</p></div><label className="secondary-button">Import<input type="file" accept=".json,application/json" hidden onChange={e=>importData(e.target.files?.[0])}/></label></div><div className="settings-note"><HardDrive size={15}/> {supabaseConfigured?"Your workspace is synced to Supabase and protected by account-level access policies.":"Your resources are saved locally in this browser. Configure Supabase to enable account sign-in and cloud sync."}</div><div className="modal-actions"><button className="primary-button" onClick={()=>setModal(null)}>Done</button></div></>}
       {modal==="help"&&<><div className="shortcut-row"><span>Search resources</span><kbd>Ctrl / ⌘ + K</kbd></div><div className="shortcut-row"><span>New drop</span><kbd>N</kbd></div><div className="shortcut-row"><span>Close dialog</span><kbd>Esc</kbd></div><p className="form-hint">Shortcuts are available while the workspace is focused.</p><div className="modal-actions"><button className="primary-button" onClick={()=>setModal(null)}>Got it</button></div></>}
     </div></div>}
-    {modal==="upload"&&<UploadDialog key={uploadFiles.map(file=>`${file.name}:${file.size}:${file.lastModified}`).join("|")} initialFiles={uploadFiles} projects={projects} initialProject={project==="All"?(projects[0]||"Research"):project} userId={session?.user.id} onClose={closeUpload} onComplete={completeUpload} notify={notify}/>}
+    {modal==="upload"&&<UploadDialog key={uploadFiles.map(file=>`${file.name}:${file.size}:${file.lastModified}`).join("|")} initialFiles={uploadFiles} projects={projects} initialProject={project==="All"?(projects[0]||""):project} userId={session?.user.id} onClose={closeUpload} onComplete={completeUpload} notify={notify}/>}
     {toast&&<div className="toast"><Check size={15}/>{toast}</div>}
   </div>;
 }

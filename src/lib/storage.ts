@@ -4,6 +4,11 @@ import { supabase, supabaseConfigured } from "./supabase";
 import type { Resource, WorkspaceState } from "../types";
 
 const STORAGE_KEY = "dropspace-workspace-v2";
+const STARTER_RESOURCE_IDS = new Set([
+  "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12",
+]);
+const STARTER_PROJECTS = new Set(["Research", "Development", "Inspiration"]);
+const emptyWorkspace = (): WorkspaceState => ({ projects: [], items: [] });
 
 class WorkspaceDb extends Dexie {
   items!: Table<Resource, string>;
@@ -30,40 +35,51 @@ const isRecordArray = (value: unknown): value is Resource[] => Array.isArray(val
 
 const normalizeWorkspace = (value: unknown): WorkspaceState => {
   if (!value || typeof value !== "object") {
-    return { ...defaultWorkspace };
+    return emptyWorkspace();
   }
 
   const candidate = value as Partial<WorkspaceState>;
-  const projects = Array.isArray(candidate.projects)
+  const savedProjects = Array.isArray(candidate.projects)
     ? candidate.projects.filter((p): p is string => typeof p === "string")
-    : [...defaultWorkspace.projects];
+    : [];
 
-  const items = isRecordArray(candidate.items)
-    ? candidate.items.map((item) => ({
+  const savedItems = isRecordArray(candidate.items)
+    ? candidate.items.filter((item): item is Resource => Boolean(item && typeof item === "object"))
+    : [];
+  const containsStarterResources = savedItems.some((item) => STARTER_RESOURCE_IDS.has(item.id));
+  const items = savedItems
+    .filter((item) => !STARTER_RESOURCE_IDS.has(item.id))
+    .map((item) => ({
         ...item,
         type: item.type || "Link",
         title: item.title || "Untitled item",
         description: item.description || "",
-        project: item.project || projects[0] || "Inbox",
+        project: item.project || savedProjects[0] || "Inbox",
         createdAt: item.createdAt || Date.now(),
         starred: Boolean(item.starred),
         archived: Boolean(item.archived),
         deleted: Boolean(item.deleted),
-      }))
-    : [...defaultWorkspace.items];
+      }));
 
-  return { projects: projects.length ? projects : [...defaultWorkspace.projects], items };
+  const projects = savedProjects.filter((name) =>
+    !(containsStarterResources && STARTER_PROJECTS.has(name) && !items.some((item) => item.project === name)),
+  );
+  for (const item of items) {
+    if (!projects.includes(item.project)) projects.push(item.project);
+  }
+
+  return { projects, items };
 };
 
 const readLocalStorageWorkspace = (): WorkspaceState => {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return { ...defaultWorkspace, projects: [...defaultWorkspace.projects], items: [...defaultWorkspace.items] };
+      return emptyWorkspace();
     }
     return normalizeWorkspace(JSON.parse(raw));
   } catch {
-    return { ...defaultWorkspace, projects: [...defaultWorkspace.projects], items: [...defaultWorkspace.items] };
+    return emptyWorkspace();
   }
 };
 
@@ -106,11 +122,7 @@ export const workspaceStorage = {
         .eq("user_id", userId)
         .maybeSingle();
       if (error) throw error;
-      return data ? normalizeWorkspace(data.data) : {
-        ...defaultWorkspace,
-        projects: [...defaultWorkspace.projects],
-        items: [...defaultWorkspace.items],
-      };
+      return data ? normalizeWorkspace(data.data) : emptyWorkspace();
     }
 
     try {

@@ -37,7 +37,7 @@ saveButton.addEventListener("click", async () => {
       title: tab.title || url.hostname,
       url: url.href,
       description: tab.title || url.href,
-      project: "Research",
+      project: "Inbox",
       createdAt: Date.now(),
       starred: false,
       archived: false

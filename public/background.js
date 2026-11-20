@@ -20,7 +20,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     url: info.linkUrl || "",
     content: info.selectionText || "",
     description: info.selectionText || info.linkUrl || "",
-    project: "Research",
+    project: "Inbox",
     createdAt: Date.now(),
     starred: false,
     archived: false

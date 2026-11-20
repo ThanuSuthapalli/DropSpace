@@ -16,6 +16,7 @@ For complete installation steps, see the [Installation Guide](./INSTALLATION.md)
 - **File storage:** local file bytes use IndexedDB; cloud files use a private Supabase Storage bucket.
 - **Backup and preferences:** import/export workspace JSON and switch between light and dark themes.
 - **Branding:** supplied DropSpace logo used in the web app, favicon, PWA, and Chrome extension.
+- **Clean start:** new workspaces contain no sample content; create a space and add your own resources.
 
 ## Technology
 
@@ -90,6 +91,7 @@ See the [Installation Guide](./INSTALLATION.md) for deployment prerequisites, Su
 ## Data behavior
 
 - **Local-only mode:** workspace data stays in the browser's local storage; uploaded file bytes stay in IndexedDB. This data does not automatically sync to another device or browser profile.
+- **Clean workspaces:** new accounts and browser profiles start empty. Legacy seeded entries with the original demo IDs are removed during workspace loading; other saved resources are retained.
 - **Supabase mode:** sign in with the same account on each device to sync the workspace. Cloud files are stored in the private Supabase bucket.
 - **Website and extension:** each browser origin/profile has separate local storage. Use the same Supabase account when you want cloud resources shared between the web app and extension.
 - **PWA offline behavior:** the service worker caches the app shell and static assets. It does not cache Supabase responses or private file downloads.
@@ -111,4 +113,3 @@ See the [Installation Guide](./INSTALLATION.md) for deployment prerequisites, Su
 - The website must be deployed to an HTTPS host before it can be installed from a phone outside the development machine.
 - Chrome Web Store publication has not been completed.
 - AI categorization and collaboration are not connected.
-- Sample resources are illustrative starter data.

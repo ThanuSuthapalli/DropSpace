@@ -49,7 +49,7 @@ export default function UploadDialog({
   );
   const [urlValue, setUrlValue] = useState("");
   const [links, setLinks] = useState<Array<{ id: string; url: string }>>([]);
-  const [projectMode, setProjectMode] = useState<"new" | "existing">("existing");
+  const [projectMode, setProjectMode] = useState<"new" | "existing">(projects.length ? "existing" : "new");
   const [newProject, setNewProject] = useState("");
   const [existingProject, setExistingProject] = useState(
     projects.includes(initialProject) ? initialProject : projects[0] || "",

@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>DropSpace</title>
+    <style>
+      body{width:280px;padding:18px;margin:0;font:14px system-ui;background:#f6f5f1;color:#292a25}
+      h2{display:flex;align-items:center;gap:8px;margin:0 0 5px}
+      h2:before{content:"";width:28px;height:28px;flex:none;border-radius:7px;background:#bc693c url("dropspace-logo.png") center/cover no-repeat;background-blend-mode:screen}
+      p{color:#777;font-size:12px;line-height:1.5}
+      button{width:100%;padding:11px;border:1px solid #bc693c;border-radius:7px;background:#bc693c;color:white;font-weight:650;cursor:pointer;margin-top:8px}
+      button.secondary{background:#fffefa;color:#5e5e56;border-color:#deddd5}
+      button:disabled{opacity:.6;cursor:wait}
+      #status{min-height:16px;margin-bottom:0}
+    </style>
+  </head>
+  <body>
+    <h2>dropspace<span style="color:#bc693c">.</span></h2>
+    <p>Your digital desk. Collect now, organize later.</p>
+    <button id="save">Save this page</button>
+    <button id="open" class="secondary">Open workspace</button>
+    <p id="status" role="status"></p>
+    <script src="popup.js"></script>
+  </body>
+</html>
